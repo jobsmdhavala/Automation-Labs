@@ -1,0 +1,24 @@
+devices:
+  CSR:
+    os: iosxe
+    type: router
+    connections:
+      cli:
+        protocol: ssh
+        ip: 192.168.0.101
+    credentials:
+      default:
+        username: admin
+        password: admin
+
+  R2:
+    os: ios
+    type: router
+    connections:
+      cli:
+        protocol: ssh
+        ip: 192.168.0.102
+    credentials:
+      default:
+        username: admin
+        password: admin
