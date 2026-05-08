@@ -6,6 +6,8 @@ devices:
       cli:
         protocol: ssh
         ip: 192.168.0.101
+        # Add these legacy SSH options
+        ssh_options: '-o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa'
     credentials:
       default:
         username: admin
@@ -18,6 +20,8 @@ devices:
       cli:
         protocol: ssh
         ip: 192.168.0.102
+        # Add these legacy SSH options
+        ssh_options: '-o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa'
     credentials:
       default:
         username: admin
