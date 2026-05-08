@@ -131,6 +131,36 @@ pip install genie
 
 > Always activate the virtual environment before running pyATS scripts.
 
+Here is the content of pyats installation bash script
+#!/bin/bash
+
+# Update & install dependencies
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y python3 python3-venv python3-pip git sshpass
+
+# Create directories
+mkdir -p ~/Automation-Labs/env
+mkdir -p ~/Automation-Labs/pyats/testbeds
+mkdir -p ~/Automation-Labs/pyats/scripts
+
+# Create virtual environment
+python3 -m venv ~/Automation-Labs/env/pyats
+
+# Activate venv
+source ~/Automation-Labs/env/pyats/bin/activate
+
+# Upgrade pip
+pip install --upgrade pip
+
+# Install pyATS and Genie
+pip install pyats
+pip install genie
+
+# Test pyATS version
+pyats version
+
+echo "Installation complete. Virtual environment located at ~/Automation-Labs/env/pyats"
+echo "Activate with: source ~/Automation-Labs/env/pyats/bin/activate"
 ---
 
 # CSR1000v Configuration
