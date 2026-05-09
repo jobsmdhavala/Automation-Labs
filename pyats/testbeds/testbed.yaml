@@ -5,7 +5,7 @@ devices:
     connections:
       cli:
         protocol: ssh
-        ip: 192.168.0.101
+        ip: 10.10.10.101
         # Add these legacy SSH options
         ssh_options: '-o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa'
     credentials:
@@ -19,7 +19,7 @@ devices:
     connections:
       cli:
         protocol: ssh
-        ip: 192.168.0.102
+        ip: 110.10.10.102
         # Add these legacy SSH options
         ssh_options: '-o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa'
     credentials:

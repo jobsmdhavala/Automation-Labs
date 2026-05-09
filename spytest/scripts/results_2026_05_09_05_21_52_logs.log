@@ -1,0 +1,34 @@
+2026-05-09 05:21:52,644 T0000: NOTICE Execution Start Time: 2026-05-09 05:21:52.643435
+2026-05-09 05:21:52,644 T0000: NOTICE LOGS PATH: /home/ubuntu/Automation-Labs/spytest/scripts
+2026-05-09 05:21:52,649 T0000: WARN  errors section not found - using defaults
+2026-05-09 05:21:52,649 T0000: WARN  speeds section not found
+2026-05-09 05:21:52,656 T0000: ERROR Invalid testbed file:: testbed.yaml
+Traceback (most recent call last):
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/spytest/testbed.py", line 819, in _load_yaml
+    for profile in self.get_all_profiles():
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/spytest/testbed.py", line 1181, in get_all_profiles
+    retval.append(self.get_profile(index))
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/spytest/testbed.py", line 1170, in get_profile
+    retval.topology = self.topologies.setdefault(index, SpyTestDict())
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'setdefault
+StackTraceCallStack:
+[0] spytest/testbed.py:241 _load_and_check if self._load_yaml(filename):
+[1] spytest/testbed.py:98 __init__ self._load_and_check(filename)
+[2] spytest/framework.py:351 read_testbed_file self._tb = Testbed(self.cfg.testbed, self.log, self.cfg)
+[3] spytest/framework.py:222 __init__ tb_errors = self.read_testbed_file()
+[4] spytest/framework.py:911 __init__ self._context = Context(self, cfg)
+[5] spytest/framework.py:4827 _create_work_area2 wa = WorkArea(cfg)
+[6] spytest/framework.py:4845 _create_work_area wa = _create_work_area2(request.config)
+[7] spytest/framework.py:6019 fixture_callback _create_work_area(request)
+[8] spytest/splugin.py:223 global_session_request stf.fixture_callback(request, "session", False)
+[9] spytest/main.py:288 main retval = pytest.main()
+[10] bin/spytest:35 <module> sys.exit(main())
+2026-05-09 05:21:52,656 T0000: NOTICE VERSION: master 3237ba9b890134f95ca85cdd1ef690eb6485776f 2026-05-09 09:42:16+08:00
+2026-05-09 05:21:52,656 T0000: NOTICE HOST: madhu-labs MEM: 29gb 13.5%
+2026-05-09 05:21:52,656 T0000: NOTICE ROOT_PATH: /home/ubuntu/Automation-Labs/sonic-mgmt/spytest
+2026-05-09 05:21:52,657 T0000: NOTICE Python: 3.12.3
+2026-05-09 05:21:52,657 T0000: NOTICE Topology unknown: D1
+2026-05-09 05:21:52,657 T0000: NOTICE ARGS: test_pnet_spytest.py --testbed-file testbed.yaml -vv --skip-init-config

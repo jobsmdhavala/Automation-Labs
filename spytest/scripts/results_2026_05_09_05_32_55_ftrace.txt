@@ -1,0 +1,41 @@
+ ____  ____       _____         _   
+/ ___||  _ \ _   |_   _|__  ___| |_ 
+\___ \| |_) | | | || |/ _ \/ __| __|
+ ___) |  __/| |_| || |  __/\__ \ |_ 
+|____/|_|    \__, ||_|\___||___/\__|
+             |___/                  
+
+SPYTEST_RANDOM_SEED used = 10617
+
+VERSION: master 3237ba9b890134f95ca85cdd1ef690eb6485776f 2026-05-09 09:42:16+08:00
+
+tcmap verify took 0:00:00
+Tests considered 1 and ignored 0
+Traceback (most recent call last):
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/spytest/framework.py", line 4827, in _create_work_area2
+    wa = WorkArea(cfg)
+         ^^^^^^^^^^^^^
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/spytest/framework.py", line 911, in __init__
+    self._context = Context(self, cfg)
+                    ^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/spytest/framework.py", line 250, in __init__
+    self.wa._init_features()
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/spytest/framework.py", line 948, in _init_features
+    self.feature = self.hooks.init_features(self.cfg.feature_group,
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/apis/common/hooks.py", line 153, in init_features
+    return self._impl(None).init_features(fgroup, fsupp, funsupp)
+           ^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/apis/common/hooks.py", line 34, in _impl
+    from apis.common.sonic_hooks import SonicHooks
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/apis/common/sonic_hooks.py", line 13, in <module>
+    from apis.switching import mac
+  File "/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/apis/switching/mac.py", line 15, in <module>
+    from utilities.utils import get_random_space_string
+ImportError: cannot import name 'get_random_space_string' from 'utilities.utils' (/home/ubuntu/Automation-Labs/sonic-mgmt/spytest/utilities/utils.py
+StackTraceCallStack:
+[0] spytest/framework.py:4845 _create_work_area wa = _create_work_area2(request.config)
+[1] spytest/framework.py:6019 fixture_callback _create_work_area(request)
+[2] spytest/splugin.py:223 global_session_request stf.fixture_callback(request, "session", False)
+[3] spytest/main.py:288 main retval = pytest.main()
+[4] bin/spytest:35 <module> sys.exit(main())

@@ -1,37 +1,29 @@
 import snappi
+import time
 
 # 1. Connect to Controller
 api = snappi.api(location="https://localhost:8443", verify=False)
 config = api.config()
 
-# 2. Define Single Port (for one-arm/tx-only test) [web:3][web:2]
+# 2. Define Port
 port = config.ports.port(name="p1", location="localhost:5555")[-1]
 
-# 3. Define Flow - One-arm unidirectional (tx_name ONLY, no rx_name) [web:2]
+# 3. Define Flow
 flow = config.flows.flow(name="f1")[-1]
 flow.tx_rx.port.tx_name = port.name
-# DO NOT set rx_name - use choice for port-based tx-only
+flow.metrics.enable = True  # Required for flow metrics
 
-# 4. Use Ethernet header (NOT custom bytes - more reliable) [web:3]
-eth = flow.packet.ethernet()[-1]
-eth.dst.value = "ff:ff:ff:ff:ff:ff"  # Broadcast MAC
-eth.src.value = "bc:24:11:fe:5f:f7"  # Your ens20 MAC
-# eth.type is auto-set when you add IPv4
-
-# Optional: Add IPv4 header for valid packets
-ip = flow.packet.ipv4()[-1]
-ip.src.value = "192.168.1.100"
-ip.dst.value = "192.168.1.1"
-
-# Optional: Add UDP header so packets are valid
-udp = flow.packet.udp()[-1]
-udp.src_port.value = 12345
-udp.dst_port.value = 5000
+# 4. Headers
+eth, ip, udp = flow.packet.ethernet().ipv4().udp()
+eth.dst.value = "ff:ff:ff:ff:ff:ff"
+eth.src.value = "bc:24:11:fe:5f:f7" # Your ens20 MAC
+ip.src.value = "10.10.10.34"
+ip.dst.value = "10.10.10.101"
 
 # 5. Traffic Properties
 flow.size.fixed = 128
 flow.rate.pps = 100
-flow.duration.choice = flow.duration.CONTINUOUS
+flow.duration.fixed_packets.packets = 1000 # Use fixed packets for easier verification
 
 # 6. Push config and Start
 try:
@@ -39,26 +31,23 @@ try:
     api.set_config(config)
     print("✓ Configuration accepted!")
     
-    print("Starting capture (optional)...")
-    cs = api.capture_state()
-    cs.state = cs.START
-    api.set_capture_state(cs)
-    
+    # NEW WAY: Use control_state for everything (Capture, Traffic, etc.)
     print("Starting traffic...")
-    ts = api.transmit_state()
-    ts.state = ts.START
-    api.set_transmit_state(ts)
+    cs = api.control_state()
+    cs.traffic.flow_transmit.state = cs.traffic.flow_transmit.START
+    api.set_control_state(cs)
     print("✓ Traffic is now active!")
     
-    # Wait a bit then fetch metrics
-    import time
+    # Wait for traffic to finish
     time.sleep(5)
     
+    # NEW WAY: Requesting metrics
     req = api.metrics_request()
-    req.port.port_names = [port.name]
-    req.port.column_names = [req.port.FRAMES_TX, req.port.FRAMES_RX]
+    req.flow.flow_names = [flow.name]
     res = api.get_metrics(req)
-    print(f"Frames TX: {res.port_metrics[0].frames_tx}")
+    
+    for m in res.flow_metrics:
+        print(f"Flow: {m.name} | Frames TX: {m.frames_tx} | Status: {m.transmit}")
     
 except Exception as e:
     print(f"Failed: {e}")

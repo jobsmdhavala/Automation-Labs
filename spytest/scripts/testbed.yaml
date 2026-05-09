@@ -1,0 +1,60 @@
+version: 2.0
+
+services:
+    default: {}
+
+configs:
+    default:
+        current: []
+        restore: []
+
+params:
+    def_dut: {}
+    def_tg: {}
+
+builds:
+    default: {}
+
+devices:
+
+    CSR:
+        device_type: router
+        os: iosxe
+
+        access:
+            protocol: ssh
+            ip: 10.10.10.101
+
+        credentials:
+            username: admin
+            password: admin
+
+        properties:
+            config: default
+            params: def_dut
+            ssh_options: "-o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa"
+
+    R2:
+        device_type: router
+        os: ios
+
+        access:
+            protocol: ssh
+            ip: 10.10.10.102
+
+        credentials:
+            username: admin
+            password: admin
+
+        properties:
+            config: default
+            params: def_dut
+            ssh_options: "-o KexAlgorithms=+diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1 -o HostKeyAlgorithms=+ssh-rsa"
+
+topology:
+
+    CSR:
+        interfaces: {}
+
+    R2:
+        interfaces: {}
